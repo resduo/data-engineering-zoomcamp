@@ -1,5 +1,5 @@
 # Start with the base Ubuntu image
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 # Add label maintainer
 LABEL maintainer="gluonhiggs"
@@ -25,10 +25,10 @@ ENV REFRESHED_AT 2023-05-26
 
 # Copy all files in the current directory on the host machine
 # to the /workspaces/ directory in the Docker image
-COPY . /workspaces/
+COPY . /workspaces
 
 # Install Python packages specified in requirements.txt
-RUN pip3 install -r ./.devcontainer/requirements.txt
+RUN python3 -m pip install -r ./.devcontainer/requirements.txt
 
 # Make port 8888 available to the world outside this container
 EXPOSE 8888
