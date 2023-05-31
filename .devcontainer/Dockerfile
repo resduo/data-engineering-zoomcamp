@@ -3,8 +3,6 @@ FROM ubuntu:22.04
 # Add label maintainer
 LABEL maintainer="gluonhiggs"
 
-# Specify the path of the workspace
-WORKDIR /workspaces
 
 # Install software-properties-common, and then Python 3.10 using APT repository
 RUN apt-get update &&\
@@ -14,17 +12,19 @@ RUN apt-get update &&\
     apt-get install -y python3.10 python3.10-distutils python3.10-venv python3.10-dev&& \
     apt-get install -y curl openjdk-11-jdk
 
-ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64
+ENV LC_ALL C
+
+# # Install required pip packages including pyspark from requirements.txt
+RUN mkdir /workspaces
+WORKDIR /workspaces
+COPY . /workspaces
+
 
 RUN curl https://bootstrap.pypa.io/get-pip.py | python3 && \
     pip3 install --upgrade pip
 
-# Set an environment variable
-ENV REFRESHED_AT 2023-05-26
-
 # Copy all files in the current directory on the host machine
 # to the /workspaces/ directory in the Docker image
-COPY . /workspaces
 
 # Install Python packages specified in requirements.txt
 RUN python3 -m pip install -r ./.devcontainer/requirements.txt
