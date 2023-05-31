@@ -3,31 +3,41 @@ FROM ubuntu:22.04
 # Add label maintainer
 LABEL maintainer="gluonhiggs"
 
+ARG JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
 # Install software-properties-common, and then Python 3.10 using APT repository
-RUN apt-get update &&\
-    apt-get install -y software-properties-common && \
-    add-apt-repository ppa:deadsnakes/ppa && \
-    apt-get update &&\
-    apt-get install -y python3.10 python3.10-distutils python3.10-venv python3.10-dev&& \
-    apt-get install -y curl openjdk-11-jdk
+RUN apt update &&\
+    apt install -y software-properties-common &&\
+    # apt-get install -y curl unzip &&\
+    apt install -y openjdk-11-jdk &&\
+    apt update && \
+    apt install ca-certificates-java -y && \
+    apt clean && \
+    update-ca-certificates -f
+# # Use the output of "which java" to set JAVA_HOME
+# RUN JAVA_HOME=$(whereis java) && echo $JAVA_HOME > /etc/environment
 
-ENV LC_ALL C
+# # Add JAVA_HOME to PATH
+# ENV PATH="${JAVA_HOME}/bin:${PATH}"
 
-# # Install required pip packages including pyspark from requirements.txt
-RUN mkdir /workspaces
-WORKDIR /workspaces
-COPY . /workspaces
+# Create a directory for our application
+# RUN mkdir /workspaces
+# WORKDIR /workspaces
+# COPY . /workspaces
 
+# #  Update pip
+# RUN python3 -m pip install --upgrade pip
 
-RUN curl https://bootstrap.pypa.io/get-pip.py | python3 && \
-    pip3 install --upgrade pip
+# RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.0.30.zip" -o "awscliv2.zip" && \
+#     unzip awscliv2.zip && \
+#     ./aws/install
+    
+# ENV REFRESHED_AT 2023-01-06
 
-# Copy all files in the current directory on the host machine
-# to the /workspaces/ directory in the Docker image
+# # Install Python packages specified in requirements.txt
+# RUN python3 -m pip install -r ./.devcontainer/requirements.txt
 
-# Install Python packages specified in requirements.txt
-RUN python3 -m pip install -r ./.devcontainer/requirements.txt
-
-# Make port 8888 available to the world outside this container
-EXPOSE 8888
+# # Make port 8888 available to the world outside this container
+# EXPOSE 8888
+CMD ["java", "--version"]
