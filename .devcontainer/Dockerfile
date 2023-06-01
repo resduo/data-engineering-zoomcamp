@@ -17,15 +17,21 @@ RUN apt update &&\
     update-ca-certificates -f
 # Python installation
 RUN apt install -y python3.10 python3-pip python3.10-dev &&\
-    apt install -y curl unzip
+    apt install -y curl unzip wget
 
 ARG SPARK_HOME=/usr/local/spark
 ENV PATH="${SPARK_HOME}/bin:$PATH"
 
-RUN wget https://downloads.apache.org/spark/spark-3.0.1/spark-3.0.1-bin-hadoop2.7.tgz &&\
-    tar -xzf spark-3.0.1-bin-hadoop2.7.tgz &&\
-    mv spark-3.0.1-bin-hadoop2.7 spark
+ENV SPARK_VERSION=3.0.2 \
+HADOOP_VERSION=3.2 \
+SPARK_HOME=/opt/spark \
+PYTHONHASHSEED=1
 
+# Download and uncompress spark from the apache archive
+RUN wget --no-verbose -O apache-spark.tgz "https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz" \
+&& mkdir -p /opt/spark \
+&& tar -xf apache-spark.tgz -C /opt/spark --strip-components=1 \
+&& rm apache-spark.tgz
 
 
 # Create a directory for our application
