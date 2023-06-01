@@ -53,4 +53,3 @@ RUN python3 -m pip install -r ./.devcontainer/requirements.txt
 
 # Make port 8888 available to the world outside this container
 EXPOSE 8888
-CMD ["java", "--version"]
