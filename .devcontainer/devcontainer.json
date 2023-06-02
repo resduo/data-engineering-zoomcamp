@@ -9,17 +9,17 @@
 	},
 
 	// Set *default* container specific settings.json values on container create.
-	"customizations": {
-		"vscode": {
-			"settings": {
-				"terminal.integrated.profiles.linux": {
-					"bash": {
-						"path": "bash"
-						}
-    			}
-			}
-		}
-	},
+	// "customizations": {
+	// 	"vscode": {
+	// 		"settings": {
+	// 			"terminal.integrated.profiles.linux": {
+	// 				"bash": {
+	// 					"path": "bash"
+	// 					}
+    // 			}
+	// 		}
+	// 	}
+	// },
 
 	// Add the IDs of extensions you want installed when the container is created.
 	// "extensions": [
@@ -27,7 +27,7 @@
 	// ],
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
-	"forwardPorts": [8888]
+	// "forwardPorts": [8888]
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "pip3 install --user -r .devcontainer/requirements.txt"
