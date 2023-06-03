@@ -8,7 +8,6 @@ FROM ubuntu:22.04 AS builder
 LABEL maintainer="gluonhiggs"
 
 # Create a directory for our application
-RUN mkdir /workspaces
 WORKDIR /workspaces
 COPY . /workspaces
 
@@ -62,7 +61,7 @@ RUN python3 -m pip install -r ./.devcontainer/requirements.txt
 # Keeping only the app in the image
 FROM ubuntu:22.04
 WORKDIR /workspaces
-COPY --from=builder /workspaces .
+COPY --from=builder /workspaces /workspaces
 
 # Make port 8888 available to the world outside this container
 EXPOSE 8888
