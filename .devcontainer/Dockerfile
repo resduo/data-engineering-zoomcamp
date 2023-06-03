@@ -1,7 +1,17 @@
-# Start with the base Ubuntu image
 FROM ubuntu:22.04
+WORKDIR /workspaces
+COPY --from=builder /workspaces .
+# Make port 8888 available to the world outside this container
+EXPOSE 8888
+# Start with the base Ubuntu image
+FROM ubuntu:22.04 AS builder
 # Add label maintainer
 LABEL maintainer="gluonhiggs"
+
+# Create a directory for our application
+RUN mkdir /workspaces
+WORKDIR /workspaces
+COPY . /workspaces
 
 ARG JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 ENV PATH="${JAVA_HOME}/bin:$PATH"
@@ -34,10 +44,6 @@ RUN wget --no-verbose -O apache-spark.tgz "https://archive.apache.org/dist/spark
 && rm apache-spark.tgz
 
 
-# Create a directory for our application
-RUN mkdir /workspaces
-WORKDIR /workspaces
-COPY . /workspaces
 
 #  Update pip
 RUN python3 -m pip install --upgrade pip
@@ -51,5 +57,11 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.0.30.zip" -o "a
 # Install Python packages specified in requirements.txt
 RUN python3 -m pip install -r ./.devcontainer/requirements.txt
 
+FROM ubuntu:22.04
+WORKDIR /workspaces
+COPY --from=builder /workspaces .
 # Make port 8888 available to the world outside this container
 EXPOSE 8888
+
+
+
