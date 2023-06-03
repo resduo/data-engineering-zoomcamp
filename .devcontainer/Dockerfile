@@ -1,17 +1,16 @@
+# Use builder pattern to build the image
+# https://docs.docker.com/develop/develop-images/multistage-build/
+# https://docs.docker.com/develop/develop-images/dockerfile_best-practices/
+# Get based image
 FROM ubuntu:22.04
-WORKDIR /workspaces
-COPY --from=builder /workspaces .
-# Make port 8888 available to the world outside this container
-EXPOSE 8888
-# Start with the base Ubuntu image
-FROM ubuntu:22.04 AS builder
+
 # Add label maintainer
 LABEL maintainer="gluonhiggs"
 
 # Create a directory for our application
-RUN mkdir /workspaces
 WORKDIR /workspaces
-COPY . /workspaces
+COPY ./.devcontainer/requirements.txt /workspaces/.devcontainer/requirements.txt
+# Set environment variables for Java
 
 ARG JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 ENV PATH="${JAVA_HOME}/bin:$PATH"
@@ -25,10 +24,12 @@ RUN apt update &&\
     apt install ca-certificates-java -y && \
     apt clean && \
     update-ca-certificates -f
+
 # Python installation
 RUN apt install -y python3.10 python3-pip python3.10-dev &&\
     apt install -y curl unzip wget
 
+# Set environment variables for Spark
 ARG SPARK_HOME=/usr/local/spark
 ENV PATH="${SPARK_HOME}/bin:$PATH"
 
@@ -43,11 +44,10 @@ RUN wget --no-verbose -O apache-spark.tgz "https://archive.apache.org/dist/spark
 && tar -xf apache-spark.tgz -C /opt/spark --strip-components=1 \
 && rm apache-spark.tgz
 
-
-
-#  Update pip
+# Update pip
 RUN python3 -m pip install --upgrade pip
 
+# Install AWS CLI
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.0.30.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
     ./aws/install
@@ -57,9 +57,11 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.0.30.zip" -o "a
 # Install Python packages specified in requirements.txt
 RUN python3 -m pip install -r ./.devcontainer/requirements.txt
 
-FROM ubuntu:22.04
-WORKDIR /workspaces
-COPY --from=builder /workspaces .
+# # Keeping only the app in the image
+# FROM ubuntu:22.04
+# WORKDIR /workspaces
+# COPY --from=builder /workspaces /workspaces
+COPY . /workspaces
 # Make port 8888 available to the world outside this container
 EXPOSE 8888
 
