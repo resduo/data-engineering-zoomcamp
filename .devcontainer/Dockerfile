@@ -2,15 +2,14 @@
 # https://docs.docker.com/develop/develop-images/multistage-build/
 # https://docs.docker.com/develop/develop-images/dockerfile_best-practices/
 # Get based image
-FROM ubuntu:22.04 AS builder
+FROM ubuntu:22.04
 
 # Add label maintainer
 LABEL maintainer="gluonhiggs"
 
 # Create a directory for our application
 WORKDIR /workspaces
-COPY . /workspaces
-
+COPY ./.devcontainer/requirements.txt /workspaces/.devcontainer/requirements.txt
 # Set environment variables for Java
 
 ARG JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
@@ -58,11 +57,11 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.0.30.zip" -o "a
 # Install Python packages specified in requirements.txt
 RUN python3 -m pip install -r ./.devcontainer/requirements.txt
 
-# Keeping only the app in the image
-FROM ubuntu:22.04
-WORKDIR /workspaces
-COPY --from=builder /workspaces /workspaces
-
+# # Keeping only the app in the image
+# FROM ubuntu:22.04
+# WORKDIR /workspaces
+# COPY --from=builder /workspaces /workspaces
+COPY . /workspaces
 # Make port 8888 available to the world outside this container
 EXPOSE 8888
 
