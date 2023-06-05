@@ -18,7 +18,7 @@ ENV PATH="${JAVA_HOME}/bin:$PATH"
 # Install software-properties-common, and then Python 3.10 using APT repository
 RUN apt update &&\
     apt install -y software-properties-common &&\
-    add-apt-repository ppa:deadsnakes/ppa &&\
+    add-apt-repository -y ppa:deadsnakes/ppa &&\
     apt install -y openjdk-11-jdk-headless &&\
     apt update && \
     apt install ca-certificates-java -y && \
