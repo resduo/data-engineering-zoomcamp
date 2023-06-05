@@ -77,5 +77,4 @@ def etl_web_to_s3():
     write_dataframe_to_s3_parquet(cleaned_data, s3_bucket, s3_key)
 
 
-dag = etl_web_to_s3()
-dag
+etl_web_to_s3()
