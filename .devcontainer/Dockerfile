@@ -27,7 +27,7 @@ RUN apt update &&\
 
 # Python installation
 RUN apt install -y python3.10 python3-pip python3.10-dev &&\
-    apt install -y curl unzip wget
+    apt install -y curl unzip wget nano
 
 # Set environment variables for Spark
 ARG SPARK_HOME=/usr/local/spark

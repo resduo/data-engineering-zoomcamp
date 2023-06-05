@@ -79,7 +79,7 @@ def write_dataframe_to_s3_parquet(dataframe, bucket_name, s3_key):
         logging.info(f"Data saved to s3://{bucket_name}/{s3_key}")
     except Exception as e:
         logging.error(f"Could not save data to s3://{bucket_name}/{s3_key}")
-        logging.error(str(e))
+        logging.error(e)
 fetched_data = fetch_data(dataset_url)
 cleaned_data = clean(fetched_data)
 write_dataframe_to_s3_parquet(cleaned_data, "terraform-data-lake-666243375423", "test_s3_key")
