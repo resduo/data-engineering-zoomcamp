@@ -2,18 +2,15 @@
 # https://docs.docker.com/develop/develop-images/multistage-build/
 # https://docs.docker.com/develop/develop-images/dockerfile_best-practices/
 # Get based image
-FROM ubuntu:22.04
+FROM ubuntu:22.04 AS development
 
+FROM development AS builder
 # Add label maintainer
 LABEL maintainer="gluonhiggs"
 
-# Create a directory for our application
+# Create a directory for our application 
 WORKDIR /workspaces
-COPY ./.devcontainer/requirements.txt /workspaces/.devcontainer/requirements.txt
-# Set environment variables for Java
-
-ARG JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
-ENV PATH="${JAVA_HOME}/bin:$PATH"
+COPY ./requirements.txt /workspaces/
 
 # Install software-properties-common, and then Python 3.10 using APT repository
 RUN apt update &&\
@@ -25,19 +22,25 @@ RUN apt update &&\
     apt clean && \
     update-ca-certificates -f
 
+# Set environment variables for Java
+
+ARG JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+ENV PATH="${JAVA_HOME}/bin:$PATH"
+
 # Python installation
 RUN apt install -y python3.10 python3-pip python3.10-dev &&\
     apt install -y curl unzip wget nano
 
 # Set environment variables for Spark
-ARG SPARK_HOME=/usr/local/spark
-ENV PATH="${SPARK_HOME}/bin:$PATH"
+# ARG SPARK_HOME=/usr/local/spark
+
 
 ENV SPARK_VERSION=3.0.2 \
 HADOOP_VERSION=3.2 \
 SPARK_HOME=/opt/spark \
 PYTHONHASHSEED=1
 
+ENV PATH="${SPARK_HOME}/bin:$PATH"
 # Download and uncompress spark from the apache archive
 RUN wget --no-verbose -O apache-spark.tgz "https://archive.apache.org/dist/spark/spark-${SPARK_VERSION}/spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}.tgz" \
 && mkdir -p /opt/spark \
@@ -55,15 +58,13 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.0.30.zip" -o "a
 # ENV REFRESHED_AT 2023-01-06
 
 # Install Python packages specified in requirements.txt
-RUN python3 -m pip install -r ./.devcontainer/requirements.txt
+RUN python3 -m pip install -r requirements.txt
+COPY . /workspaces
 
 # # Keeping only the app in the image
-# FROM ubuntu:22.04
-# WORKDIR /workspaces
-# COPY --from=builder /workspaces /workspaces
-COPY . /workspaces
+FROM ubuntu:22.04 AS production
+WORKDIR /workspaces
+COPY --from=builder /workspaces .
 # Make port 8888 available to the world outside this container
+
 EXPOSE 8888
-
-
-
